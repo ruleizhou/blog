@@ -75,6 +75,13 @@ pagination_dir: page
 ## Themes: https://hexo.io/themes/
 theme: next
 
+heading_index:
+  enable: true
+  index_styles: "{1} {1} {1} {1} {1} {1}"
+  connector: "."
+  global_prefix: ""
+  global_suffix: ". "
+
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
