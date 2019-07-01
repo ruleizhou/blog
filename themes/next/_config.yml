@@ -601,7 +601,7 @@ calendar:
 
 # Disqus
 disqus:
-  enable: true
+  enable: false
   shortname: ruleizhou
   count: true
   lazyload: false
