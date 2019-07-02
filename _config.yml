@@ -80,7 +80,7 @@ heading_index:
   index_styles: "{1} {1} {1} {1} {1} {1}"
   connector: "."
   global_prefix: ""
-  global_suffix: ". "
+  global_suffix: " "
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
