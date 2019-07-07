@@ -7,7 +7,6 @@ categories:
 - others
 tags:
 - tools
-- github
 ---
 
 目前大家在 GitHub 上发布的项目，一般使用 Markdown 来编写项目文档和 README.md 等。Markdown 一般情况下能够满足我们的文档编写需求，如果使用得当的话，效果也非常棒。不过当项目文档比较长的时候，阅读体验可能就不是那么理想了，这种情况我想大家应该都曾经遇到过。
