@@ -45,33 +45,271 @@ hwservicemanager，Framework 通过 Binder 得到的是同一个进程中的实�
 
 [参考网站](https://blog.csdn.net/shift_wwx/article/details/86525761)
 
+​	HIDL 代码样式类似于 Android 框架中的 C++ 代码，缩进 4 个空格，并且采用混用大小写的文件名。软件包声明、导入和文档字符串与 Java 中的类似，只有些微差别。
+
+下面针对 `IFoo.hal` 和 `types.hal` 的示例展示了 HIDL 代码样式。
+
+`hardware/interfaces/foo/1.0/IFoo.hal`
+
+```
+/*
+ * (License Notice)
+ */
+ 
+package android.hardware.foo@1.0;
+ 
+import android.hardware.bar@1.0::IBar;
+ 
+import IBaz;
+import IFooClientCallback;
+ 
+/**
+ * IFoo is an interface that…
+ */
+interface IFoo {
+ 
+    /**
+     * This is a multiline docstring.
+     * @return result 0 if successful, nonzero otherwise.
+     */
+     foo() generates (FooStatus result);
+ 
+    /**
+     * Restart controller by power cycle.
+     * @param bar callback interface that…
+     * @return result 0 if successful, nonzero otherwise.
+     */
+    powerCycle(IBar bar) generates (FooStatus result);
+ 
+    /** Single line docstring. */
+    baz();
+ 
+    /**
+     * The bar function.
+     * @param clientCallback callback after function is called
+     * @param baz related baz object
+     * @param data input data blob
+     */
+    bar(IFooClientCallback clientCallback,
+        IBaz baz,
+        FooData data);
+ 
+}
+```
+
+`hardware/interfaces/foo/1.0/types.hal`
+
+```hal
+/*
+ * (License Notice)
+ */
+ 
+package android.hardware.foo@1.0;
+ 
+/** Replied status. */
+enum Status : int32_t {
+    OK,
+    ERR_ARG, // invalid arguments
+    ERR_UNKNOWN = -1, // note, no transport related errors
+};
+ 
+struct ArgData {
+    int32_t[20]  someArray;
+    vec<uint8_t> data;
+};
+```
+
 ## 命令规范
 
 ### 目录结构和文件命令
 
+目录结构应如下所示：
+
+*   Root-dir
+    *   Module
+        *   SubModule
+            *   Version
+                *   Android.bp
+                *   IInterface_1.hal
+                *   IInterface_2.hal
+                *   ...
+                *   IInterface_n.hal
+                *   types.hal (可选)
+
+其中：
+
+*   Root-dir
+
+    *   hardware/interfaces 核心HIDL软件包
+    *   vendor/VENDOR/interfaces 供应商软件包
+
+*   Module
+
+    描述系统的小写字词。如果多个字词，需使用嵌套式SubModule
+
+*   Version
+
+    版本号，格式：major.minor
+
+*   IInterface_x
+
+    接口名称
+
 ### 软件包名称
+
+软件包名称必须采用[完全限定名称(FQN)](https://source.android.com/devices/architecture/hidl/code-style#fqn)格式（称为：PACKAGE-NAME）。格式如下：
+
+```shell
+PACKAGE.MODULE[.SUBMODULE[.SUBMODULE[…]]]@VERSION
+```
 
 ### 版本
 
+格式如下：
+
+```shell
+MAJOR.MINOR
+```
+
+MAJOR 和 MINOR 版本都应该是一个整数。
+
 ### 导入
+
+格式如下：
+
+*   完整软件包导入
+
+    `import PACKAGE-NAME`
+
+*   部分导入
+
+    `import PACKAGE-NAME::UDT;`（或者，如果导入的类型是在同一个软件包中，则为 `import UDT;`）。
+
+*   仅类型导入
+
+    `import PACKAGE-NAME::types;`
+
+如果当前软件包types.hal存在，则自动导入。
+
+在软件包声明之后(在导入之前)，添加一个空行。每个导入都应占用一行，且不能缩进。按一下顺序对导入进行分组：
+
+*   android.harder 软件包（使用完全限定名称）
+*   vendor.VENDOR软件包（使用完全限定名称）
+    *   每个供应商应为一组
+    *   按字母顺序对供应商进行排序
+*   源自同一个软件包的其他接口导入（使用简单名称）
+
+在组与组之间添加一行空行。每个组内，按照字母顺序对导入进行排序。
 
 ### 接口名称
 
+接口名称必须以 `I` 开头，后跟 `UpperCamelCase`/`PascalCase` 名称。名称为 `IFoo` 的接口必须在文件 `IFoo.hal` 中定义。此文件只能包含 `IFoo` 接口的定义（接口 `INAME` 应位于 `INAME.hal` 中）。
+
 ### 函数
+
+对于函数名称、参数和返回变量名称，请使用 `lowerCamelCase`。例如：
+
+```C++
+open(INfcClientCallback clientCallback) generates (int32_t retVal);
+oneway pingAlive(IFooCallback cb);
+```
 
 ### 结构体/联合字段名称
 
+对于结构体/联合字段名称，请使用 `lowerCamelCase`。例如：
+
+```C++
+    struct FooReply {
+        vec<uint8_t> replyData;
+    }
+```
+
 ### 类型名称
 
+类型名称指结构体/联合定义、枚举类型定义和 `typedef`。对于这些名称，请使用 `UpperCamelCase`/`PascalCase`。例如：
+
+```C++
+enum NfcStatus : int32_t {
+    /*...*/
+};
+struct NfcData {
+    /*...*/
+};
+```
+
 ### 枚举值
+
+枚举值应为 `UPPER_CASE_WITH_UNDERSCORES`。将枚举值作为函数参数传递以及作为函数返回项返回时，请使用实际枚举类型（而不是基础整数类型）。例如：
+
+```C++
+enum NfcStatus : int32_t {
+    HAL_NFC_STATUS_OK               = 0,
+    HAL_NFC_STATUS_FAILED           = 1,
+    HAL_NFC_STATUS_ERR_TRANSPORT    = 2,
+    HAL_NFC_STATUS_ERR_CMD_TIMEOUT  = 3,
+    HAL_NFC_STATUS_REFUSED          = 4
+};
+```
+
+注意：
+
+​	枚举类型的基础类型是在冒号后显式声明的。因为它不依赖于编译器，所以使用实际枚举类型会更明晰
 
 ## 备注
 
 ### 文件备注
 
+​	每个文件的开头都应为相应的许可通知。对于核心 HAL，该通知应为 [development/docs/copyright-templates/c.txt](https://android.googlesource.com/platform/development/+/master/docs/copyright-templates/c.txt) 中的 AOSP Apache 许可。请务必更新年份，并使用 `/* */` 样式的多行备注（如上所述）。
+
+​	您可以视需要在许可通知后空一行，后跟变更日志/版本编号信息。使用 /* */ 样式的多行备注（如上所述），在变更日志后空一行，后跟软件包声明。
+
 ### TODO 备注
 
+TODO 备注应包含全部大写的字符串 `TODO`，后跟一个冒号。例如：
+
+```C++
+// TODO: remove this code before foo is checked in.
+```
+
+只有在开发期间才允许使用 TODO 备注；TODO 备注不得存在于已发布的接口中。
+
 ### 接口/函数备注
+
+对于多行和单行文档字符串，请使用 `/** */`。对于文档字符串，请勿使用 `//`。
+
+接口的文档字符串应描述接口的一般机制、设计原理、目的等。函数的文档字符串应针对特定函数（软件包级文档位于软件包目录下的 README 文件中）。
+
+```hal
+/**
+ * IFooController is the controller for foos.
+ */
+interface IFooController {
+    /**
+     * Opens the controller.
+     * @return status HAL_FOO_OK if successful.
+     */
+    open() generates (FooStatus status);
+ 
+    /** Close the controller. */
+    close();
+};
+```
+
+必须为每个参数/返回值添加 `@param` 和 `@return`：
+
+*   必须为每个参数添加 `@param`。其后应跟参数的名称，然后是文档字符串
+*   必须为每个返回值添加 `@return`。其后应跟返回值的名称，然后是文档字符串
+
+```hal
+/**
+ * Explain what foo does.
+ * @param arg1 explain what arg1 is
+ * @param arg2 explain what arg2 is
+ * @return ret1 explain what ret1 is
+ * @return ret2 explain what ret2 is
+ */
+foo(T arg1, T arg2) generates (S ret1, S ret2);
+```
 
 ## 格式
 
