@@ -43,6 +43,8 @@ hwservicemanager，Framework 通过 Binder 得到的是同一个进程中的实�
 
 # HIDL 编程规范
 
+[参考网站](https://blog.csdn.net/shift_wwx/article/details/86525761)
+
 ## 命令规范
 
 ### 目录结构和文件命令
@@ -361,8 +363,6 @@ hidl-gen -o output_path -L language (-r interface:root) hidl_name
             return 0;
         }
         ```
-
-        
 
     2.  Android.bp
 
