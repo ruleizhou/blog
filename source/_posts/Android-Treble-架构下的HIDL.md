@@ -41,59 +41,349 @@ hwservicemanager，Framework 通过 Binder 得到的是同一个进程中的实�
 
 
 
-## HIDL 文件的组织结构
+# HIDL 编程规范
 
-​	每个 HIDL package包里都含有一个名为types.hal的文件，该文件中定义了这个包里所有 interface 共享的用户自定义数据类型，并且一般也会导入需要用到的其它包里的数据类型。
+## 命令规范
 
- 	当前包中新的定义的 interface 可以继承自从其它包里导入的 interface，这样的继承关系可以使用extend关键字实现。
+### 目录结构和文件命令
 
-​	由 Google 提供的包叫做core package，包名始终以android.hardware.开头，以子系统名加以区分。比如 NFC 包的名字就应该为android.hardware.nfc，摄像头包的名字就应该为android.hardware.camera。这些 core包存放于hardware/interfaces/目录下。
+### 软件包名称
 
-​	由各芯片厂商和 ODM厂商提供的包叫做non-core package，包名形式一般以vendor.$(vendorName).hardware.开头，比如vendor.samsung.hardware.。这些non-core包一般存放于vendor/$(vendorName)/interfaces/目录下。 
+### 版本
 
-​	包的版本使用主、次版本号进行描述，紧随包名之后。比如android.hardware.audio@2.0表述这个 audio 包的版本是 2.0，主版本号是 2，次版本号是 0。
+### 导入
 
+### 接口名称
 
+### 函数
 
-## HIDL 基础语法
+### 结构体/联合字段名称
 
-​	HIDL 的语法和 C 语言有点类似，支持嵌套声明，但不支持前向声明和预处理指令。以下是一些常用标记符和数据类型
+### 类型名称
 
-### 标记符
+### 枚举值
 
-| /* */                                        | 多行注释                                                     |
-| -------------------------------------------- | ------------------------------------------------------------ |
-| //                                           | 单行注释                                                     |
-| [empty]                                      | 表面当前项的值为空                                           |
-| ？                                           | 放置在项前，表明该项为可选项                                 |
-| ...                                          | 表明该序列包含0个或多个如前述使用的分隔符隔开的项            |
-| @entry                                       | 当前HAL模块被使用时应当被最先调用的接口                      |
-| @exit                                        | 当前HAL模块被调用时应当被最后调用的接口                      |
-| @callflow(next={"name_a","name_b","name_c"}) | 当前接口被调用后可能被调用的接口列表。其中name_a接口被调用的概率最大，name_c接口被调用的概率最小。如果只存在1个可能被调用的接口，那么花括号{ }可以省略不写。如果给定的接口名无效，则会导致VTS编译失败。 |
-| @callflow(next={"*"})                        | 当前接口被调用后可能会调用任意接口                           |
+## 备注
 
+### 文件备注
 
+### TODO 备注
 
-### 数据类型
+### 接口/函数备注
 
-| **struct**                                       | 这个关键字定义一个结构体，格式与C++同                        |
-| ------------------------------------------------ | ------------------------------------------------------------ |
-| **union**                                        | 这个关键字定义一个联合体，格式与C++同                        |
-| **MQDescriptorSync**<br />**MQDescriptorUnsync** | 这2个关键字分别定义同步和非同步的FMQ(Fast Message Queue)描述符 |
-| **memory**                                       | 这个关键字用来声明HIDL中未被映射的共享内存                   |
-| **pointer**                                      | 用这个关键字声明的pointer类型数据只能在HIDL内部使用          |
-| **bitfield<T>模板**                              | 这个关键字用来定义一个与模板T相同的可进行位操作的数据。其中T是一个由用户定义的枚举数据类型 |
-| **有限数组**                                     | 任何HIDL结构体中可被包含的数据类型都可以声明有限数组         |
-| **字符串**                                       | 字符串在HIDL中以UTF8编码存储，所以在和由Java实现的接口进行交互时需要将编码格式转换为UTF16 |
-| **vec<T>模板**                                   | 这个关键字用来定义一个包含模板T的可变大小的buffer数据。其中T可以是除句柄外的任何HIDL内建或用户自定义数据类型 |
-| **用户自定义数据类型**                           | 用户可以自定义enum、struct、union类型的数据。定义enum数据的格式与C++11同，定义struct数据的格式与C同，定义union数据的格式与C同 |
+## 格式
 
+### 软件包声明
+
+### 函数声明
+
+### 注释
+
+### 枚举声明
+
+### 结构体声明
+
+### 数组声明
+
+### 矢量声明
 
 
-### 关键字
 
-| **interface** | 用于声明HAL模块中的一个接口，是构成.hal文件的基本单元，可以从其它interface继承而来 |
-| ------------- | ------------------------------------------------------------ |
-| **package**   | 用于声明当前.hal文件中各interface接口所属的包                |
-| **import**    | 用于导入其它包里声明的interface或数据类型，以便在当前.hal文件中使用 |
 
+
+# hidl-gen 使用
+
+系统定义的所有的`.hal`接口，都是通过`hidl-gen`工具转换成对应的代码。`hidl-gen`源码路径：system/tools/hidl，是在ubuntu上可执行的二进制文件
+
+## 编译工具
+
+```shell
+make -j18 hidl-gen
+```
+
+编译之后会在out 下生成，详细看out/host/linux-x86/bin/hidl-gen。
+
+## 使用方法
+
+```shell
+hidl-gen -o output_path -L language (-r interface:root) hidl_name
+```
+
+*   -L
+
+    语言类型，包括c++, c++-headers, c++-sources, export-header, c++-impl, java, java-constants, vts, makefile, androidbp, androidbp-impl, hash等。hidl-gen可根据传入的语言类型产生不同的文件。
+
+*   hidl_name
+
+    完全限定名称的输入文件。格式：`package@version`
+
+*   -r
+
+    格式：package:path，可选，对hidl_name对应的文件来说，用来指定包名和文件所在的目录到Android系统源码根目录的路径。如果没有制定，前缀默认是：android.hardware，目录是Android源码的根目录
+
+*   -o
+
+    存放hidl-gen产生的中间文件的路径
+
+## 实例
+
+1.  在`hardware/interfaces/`目录下新建`han/1.0/`目录，并创建接口文件`IHan.hal`，目录结构如下：
+
+    ```shell
+    └── 1.0
+        └── IHan.hal
+    ```
+
+    在IHal.hal文件中只有一个接口IHan和一个方法helloWorld(string name)，代码如下：
+
+    ```hal
+    package android.hardware.han@2.0;
+     
+    interface IHan{
+                helloWorld(string name) generates (string result);
+    };
+    ```
+
+2.  自动生成对应的C++模板文件
+
+    ```shell
+    PACKAGE=android.hardware.han@1.0
+    LOC=hardware/interfaces/han/1.0/default/
+    hidl-gen -o $LOC -Lc++-impl -r android.hardware:hardware/interfaces -r  android.hidl:system/libhidl/transport $PACKAGE
+    ```
+
+    自动生成模板后目录结构如下：
+
+    ```shell
+    └── 1.0
+        ├── default
+        │   ├── Han.cpp
+        │   └── Han.h
+        └── IHan.hal
+    ```
+
+    C++ 代码如下：
+
+    ```c++
+    #include "Han.h"
+    
+    namespace android {
+    namespace hardware {
+    namespace han {
+    namespace V1_0 {
+    namespace implementation {
+    
+    // Methods from ::android::hardware::han::V1_0::IHan follow.
+    Return<void> Han::helloWorld(const hidl_string& name, helloWorld_cb _hidl_cb) {
+        // TODO implement
+        return Void();
+    }
+    
+    // Methods from ::android::hidl::base::V1_0::IBase follow.
+    
+    //IHan* HIDL_FETCH_IHan(const char* /* name */) {
+        //return new Han();
+    //}
+    //
+    }  // namespace implementation
+    }  // namespace V1_0
+    }  // namespace han
+    }  // namespace hardware
+    }  // namespace android
+    ```
+
+    如果是直通模式HAL，需要开启HIDL_FETCH_IHan。
+
+3.  自动生成C++模板对应的Android.bp文件
+
+    ```shell
+    hidl-gen -o $LOC -Landroidbp-impl -r android.hardware:hardware/interfaces  -r android.hidl:system/libhidl/transport $PACKAGE
+    ```
+
+    执行命令后目录结构如下：
+
+    ```shell
+    └── 1.0
+        ├── default
+        │   ├── Android.bp
+        │   ├── Han.cpp
+        │   └── Han.h
+        └── IHan.hal
+    ```
+
+    Android.bp内容如下：
+
+    ```makefile
+    cc_library_shared {
+        // FIXME: this should only be -impl for a passthrough hal.
+        // In most cases, to convert this to a binderized implementation, you should:
+        // - change '-impl' to '-service' here and make it a cc_binary instead of a
+        //   cc_library_shared.
+        // - add a *.rc file for this module.
+        // - delete HIDL_FETCH_I* functions.
+        // - call configureRpcThreadpool and registerAsService on the instance.
+        // You may also want to append '-impl/-service' with a specific identifier like
+        // '-vendor' or '-<hardware identifier>' etc to distinguish it. 
+        name: "android.hardware.han@1.0-impl",
+        relative_install_path: "hw",
+        // FIXME: this should be 'vendor: true' for modules that will eventually be
+        // on AOSP.
+        proprietary: true,
+        srcs: [
+            "Han.cpp",
+        ],  
+        shared_libs: [
+            "libhidlbase",
+            "libhidltransport",
+            "libutils",
+            "android.hardware.han@1.0",
+        ],  
+    }
+    ```
+
+    默认适合直通模式HAL，如果是绑定模式需要按照提示进行修改。
+
+4.  使用脚本`update-makefiles.sh`，来更新Makefile。自动在`hardware/interfaces/han/1.0`目录下生成Android.bp
+
+    ```shell
+    └── 1.0
+        ├── Android.bp
+        ├── default
+        │   ├── Android.bp
+        │   ├── Han.cpp
+        │   └── Han.h
+        └── IHan.hal
+    ```
+
+5.  在`hardware/interfaces/han/1.0/default`目录下新建`service.cpp` `android.hardware.han@1.0-service.rc`。
+
+    1.  `android.hardware.han@1.0-service.rc` 实现
+
+        ```shell
+        service han_hal_service /vendor/bin/hw/android.hardware.han@1.0-service
+            class   hal 
+            user    system
+            group   system
+        ```
+
+    2.  `service.cpp` 实现
+
+        ```C++
+        #define LOG_TAG "android.hardware.han@1.0-service"
+        #include <android/hardware/han/1.0/IHan.h>
+        #include <hidl/LegacySupport.h>
+        using android::hardware::han::V1_0::IHan;
+        using android::hardware::defaultPassthroughServiceImplementation;
+        
+        int main(){
+            return defaultPassthroughServiceImplementation<IHan> (); 
+        }
+        ```
+
+    3.  在`hardware/interfaces/han/1.0/default`的Android.bp中增加如下内容：
+
+        ```makefile
+        cc_binary {
+            name: "android.hardware.han@1.0-service",
+            init_rc: ["android.hardware.han@1.0-service.rc"],
+            vendor: true,
+            proprietary: true
+            relative_install_path: "hw",
+            srcs: [
+                "service.cpp",
+            ],  
+        
+            shared_libs: [
+                "libcutils",
+                "liblog",
+                "libhidlbase",
+                "libhidltransport",
+                "libhardware",
+                "libutils",
+                "android.hardware.han@1.0",
+            ],  
+        
+        }
+        ```
+
+        至此更HAL相关代码已经实现完成。
+
+6.  编译生成服务端和客服端要用的各种库文件。
+
+    ```shell
+    ./hardware/interfaces/update-makefiles.sh
+    mmm hardware/interfaces/han/1.0
+    ```
+
+    
+
+7.  在`manifest.xml`文件里添加接口定义
+
+    ```xml
+    <hal format="hidl">
+    	<name>android.hardware.han</name>
+    	<transport>hwbinder</transport>
+    	<version>1.0</version>
+    	<interface>
+    		<name>IHan</name>
+    		<instance>default</instance>
+    	</interface>
+    </hal>
+    ```
+
+    
+
+8.  使用C++实现客户端调用
+
+    在`hardware/interfaces/han/1.0`目录下创建test目录。并在test目录下新建HanTest.cpp Android.bp
+
+    1.  C++实现客户端调用
+
+        ```C++
+        #define LOG_TAG "android.hardware.han@1.0-service"
+        #include <hidl/Status.h>
+        #include <hidl/HidlSupport.h>
+        #include <hidl/LegacySupport.h>
+        #include <utils/misc/h>
+        #include <stdio.h>
+        
+        using ::android::hardware::hidl_string;
+        using ::android::sp;
+        using android::hardware::han::V1_0::IHan;
+        
+        int main(){
+            android::sp<IHan> service = IHan::getService();
+            if(service == NULL){
+                printf("Failed to get service\n");
+                return -1;
+            }
+            service->helloWorld("Hello Woprld");
+            return 0;
+        }
+        ```
+
+        
+
+    2.  Android.bp
+
+        ```makefile
+        cc_binary {
+            name: "han_client",
+            defaluts: ["hidl_defaults"],
+            relative_install_path: "hw",
+            proprietary: true,
+            srcs: [
+                "HanTest.cpp",
+            ],  
+            shared_libs: [
+                "liblog",
+                "libhardware",
+                "libhidlbase",
+                "libhidltransport",
+                "libutils",
+                "android.hardware.han@1.0",
+            ],  
+        }
+        ```
+
+        
