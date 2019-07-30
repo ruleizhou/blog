@@ -313,21 +313,210 @@ foo(T arg1, T arg2) generates (S ret1, S ret2);
 
 ## 格式
 
+一般格式规则包括:
+
+*   行长：每行文字最长不应超过 **80** 列
+
+*   空格：各行不得包含尾随空格；空行不得包含空格。
+
+*   空格与制表符：仅使用空格
+
+*   缩进大小：数据块缩进 **4** 个空格，换行缩进 **8** 个空格。
+
+*   大括号：（[注释值](https://source.android.com/devices/architecture/hidl/code-style#annotations)除外）**左**大括号与前面的代码在同一行，**右**大括号与后面的分号占一整行。例如：
+
+    ```hal
+    interface INfc {
+    	close();
+    };
+    ```
+
 ### 软件包声明
+
+软件包声明应位于文件顶部，在许可通知之后，应占一整行，并且不应缩进。声明软件包时需采用以下格式（有关名称格式，请参阅[软件包名称](https://source.android.com/devices/architecture/hidl/code-style#package-names)）：
+
+```hal
+package PACKAGE-NAME;
+```
+
+例如：
+
+```hal
+package android.hardware.fingerprint@2.1;
+```
 
 ### 函数声明
 
+函数名称、参数、`generates` 和返回值应在同一行中（如果放得下）。例如：
+
+```hal
+interface IFoo {
+    /** ... */
+    easyMethod(int32_t data) generates (int32_t result);
+};
+```
+
+如果一行中放不下，则尝试按相同的缩进量放置参数和返回值，并突出 `generate`，以便读取器快速看到参数和返回值。例如：
+
+```hal
+interface IFoo {
+    suchALongMethodThatCannotFitInOneLine(int32_t theFirstVeryLongParameter,
+                                          int32_t anotherVeryLongParameter);
+    anEvenLongerMethodThatCannotFitInOneLine(int32_t theFirstLongParameter,
+                                             int32_t anotherVeryLongParameter)
+                                  generates (int32_t theFirstReturnValue,
+                                             int32_t anotherReturnValue);
+    superSuperSuperSuperSuperSuperSuperLongMethodThatYouWillHateToType(
+            int32_t theFirstVeryLongParameter, // 8 spaces
+            int32_t anotherVeryLongParameter
+        ) generates (
+            int32_t theFirstReturnValue,
+            int32_t anotherReturnValue
+        );
+    // method name is even shorter than 'generates'
+    foobar(AReallyReallyLongType aReallyReallyLongParameter,
+           AReallyReallyLongType anotherReallyReallyLongParameter)
+        generates (ASuperLongType aSuperLongReturnValue, // 4 spaces
+                   ASuperLongType anotherSuperLongReturnValue);
+}
+```
+
+其他细节：
+
+*   左括号始终与函数名称在同一行
+*   函数名称和左括号之间不能有空格
+*   括号和参数之间不能有空格，它们之间出现换行时除外。
+*   如果 `generates` 与前面的右括号在同一行，则前面加一个空格。如果 `generates` 与接下来的左括号在同一行，则后面加一个空格。
+*   将所有参数和返回值对齐（如果可能）。
+*   默认缩进 4 个空格。
+*   将换行的参数与上一行的第一个参数对齐，如果不能对齐，则这些参数缩进 8 个空格。
+
 ### 注释
+
+格式如下：
+
+```hal
+@annotate(keyword = value, keyword = {value, value, value})
+```
+
+按字母顺序对注释进行排序，并在等号两边加空格。例如：
+
+```hal
+@callflow(key = value)
+@entry
+@exit
+```
+
+如果注释在同一行中放不下，则缩进 8 个空格。例如：
+
+```hal
+@annotate(
+        keyword = value,
+        keyword = {
+                value,
+                value
+        },
+        keyword = value)
+```
+
+如果整个值数组在同一行中放不下，则在左大括号 `{` 后和数组内的每个逗号后换行。在最后一个值后紧跟着添加一个右括号。如果只有一个值，请勿使用大括号。
+
+如果整个值数组可以放到同一行，则请勿在左大括号后和右大括号前加空格，并在每个逗号后加一个空格。例如：
+
+```hal
+// Good
+@callflow(key = {"val", "val"})
+ 
+// Bad
+@callflow(key = { "val","val" })
+```
+
+注释和函数声明之间不得有空行。例如：
+
+```hal
+// Good
+@entry
+foo();
+ 
+// Bad
+@entry
+ 
+foo();
+```
 
 ### 枚举声明
 
+对于结构体声明，遵循如下规则：
+
+*   如果与其他软件包共用枚举声明，则将声明放在 `types.hal` 中，而不是嵌入到接口内。
+*   在冒号前后加空格，并在基础类型后和左大括号前加空格。
+*   最后一个枚举值可以有也可以没有额外的逗号。
+
 ### 结构体声明
+
+对于结构体声明，遵循如下规则：
+
+-   如果与其他软件包共用结构体声明，则将声明放在 `types.hal` 中，而不是嵌入到接口内。
+
+-   在结构体类型名称后和左大括号前加空格。
+
+-   对齐字段名称（可选）。例如：
+
+    ```hal
+    struct MyStruct {
+        vec<uint8_t>   data;
+        int32_t        someInt;
+    }
+    ```
 
 ### 数组声明
 
+请勿在以下内容之间加空格：
+
+*   元素类型和左方括号
+*   左方括号和数组大小
+*   数组大小和右方括号
+*   右方括号和接下来的左方括号（如果存在多个维度）。
+
+例如：
+
+```hal
+// Good
+int32_t[5] array;
+     
+// Good
+int32_t[5][6] multiDimArray;
+    
+// Bad
+int32_t [ 5 ] [ 6 ] array;
+```
+
 ### 矢量声明
 
+请勿在以下内容之间加空格：
 
+*   `vec` 和左尖括号。
+*   左尖括号和元素类型（例外情况：元素类型也是 `vec`）。
+*   元素类型和右尖括号（例外情况：元素类型也是 `vec`）。
+
+例如：
+
+```hal
+// Good
+vec<int32_t> array;
+ 
+// Good
+vec<vec<int32_t>> array;
+ 
+// Good
+vec< vec<int32_t> > array;
+ 
+// Bad
+vec < int32_t > array;
+ 
+// Bad
+vec < vec < int32_t > > array;
+```
 
 
 
