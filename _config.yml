@@ -88,3 +88,8 @@ deploy:
   type: git
   repository: https://github.com/ruleizhou/ruleizhou.github.io
   branch: master
+  
+# Security
+##
+encrypt:
+  enable: true
