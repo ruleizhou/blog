@@ -4,7 +4,6 @@ typora-root-url: gitbook
 date: 2019-07-07 16:02:19
 categories:
 - tools
-- others
 tags:
 - tools
 ---

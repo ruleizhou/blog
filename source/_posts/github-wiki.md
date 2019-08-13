@@ -4,7 +4,6 @@ typora-root-url: github-wiki
 date: 2019-07-06 16:26:09
 categories:
 - tools
-- others
 tags:
 - tools
 ---
