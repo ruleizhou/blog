@@ -3,7 +3,6 @@ title: Android Treble 架构下的HIDL
 date: 2019-07-25 22:34:01
 categories:
 - Android
-- Treble
 tags:
 - Android
 - Treble
