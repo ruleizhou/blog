@@ -11,34 +11,34 @@ abstract: Welcome to personal work note, enter password to read
 message: HAN
 ---
 
-# HTC Tools
+# 1 HTC Tools
 
-## Install SsdTest_Tool
+## 1.1 Install SsdTest_Tool
 
-### 下载
+### 1.1.1 下载
 
 [下载链接](http://jenkins.htc.com/SsdTest/)
 
 根据项目选择合适的版本
 
-### 安装
+### 1.1.2 安装
 
 解压下载的软件包并执行脚步
 
-### 配置
+### 1.1.3 配置
 
 默认安装好后log功能即可使用，如果发现/data/htclog/下没有log文件输出，这需要进行额外配置。
 
 - 重启到bootloader
 - htc_fastboot oem writeconfig 5 1
 
-## htc fastboot
+## 1.2 htc fastboot
 
-### Project PID
+### 1.2.1 Project PID
 
 ![](/PID.png)
 
-### Command
+### 1.2.2Command
 
 | 命令                                                        | 说明                                       |
 | ----------------------------------------------------------- | ------------------------------------------ |
@@ -55,9 +55,9 @@ message: HAN
 | htc_fastboot oem readmid/readpid                            | read pid/mid                               |
 | htc_fastboot oem writepid/writemid  pid/mid                 | write pid/mid                              |
 
-# Log获取
+# 2 Log获取
 
-## XBL Log
+## 2.1 XBL Log
 
 - 关闭Ramdump mode
 
@@ -83,7 +83,7 @@ message: HAN
   adb pull /sys/fs/pstore/console-ramoops  .
   ```
 
-## TZ Log
+## 2.2 TZ Log
 
 TZ log 保存路径
 
@@ -94,9 +94,9 @@ adb shell cat /d/tzdbg/log > tzbsp.log
 
 
 
-# Debug
+# 3 Debug
 
-## 动态调试
+## 3.1 动态调试
 
 pr_debug/dev_dbg 可实现动态调试. 可以通过conctrol获取哪些支持动态调试的文件.在需要的时候开启log的打印.
 
