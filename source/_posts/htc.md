@@ -137,3 +137,65 @@ pr_debug/dev_dbg 可实现动态调试. 可以通过conctrol获取哪些支持�
   ```
 
   
+
+# 4 XBL
+
+## 4.1 Download XBL code 
+
+使用-g xbl 来下载XBL code
+
+```shell
+repo init -u ssh://$ID@$MIRROR:29419/manifest.git -b htc -m o-rel_gep_qct8998-muskie.xml -g xbl
+repo sync vendor/qcom/boot_images
+```
+
+## 4.2 Install Toolchain
+
+* 确认Toolchain版本
+
+  * 在bringup中有描述所需要的版本
+  * 执行make 如果为安装Toolchain 会提示所需要的版本
+
+* 下载
+
+  * \\andssd2\and_ssd\andssd_shared\Qualcomm\MSM8998\
+  * 或者到Qualcomm 官网下载
+
+* 解压到/pkg/qct/software/llvm/release/arm/
+
+  ```shell
+  sudo chown $USER:$USER . -R
+  ```
+
+## 4.3 Build XBL
+
+### 4.3.1 openssl 版本过高问题
+
+在编译过程中如果出现
+
+```shell
+sectools_builder.py returned non-zero
+```
+
+说明openssl版本过高，需要安装低版本的openssl。
+
+* [下载低版本openssl](<https://www.openssl.org/source/old/1.0.2/>)
+
+* 安装
+
+  * 编译安装
+
+    ```shell
+    ./config
+    make
+    make test
+    sudo make install
+    ```
+
+  * 配置路径
+
+    ```shell
+    export PATH=/usr/local/ssl/bin:$PATH
+    ```
+
+    
