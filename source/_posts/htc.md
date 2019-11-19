@@ -198,4 +198,72 @@ sectools_builder.py returned non-zero
     export PATH=/usr/local/ssl/bin:$PATH
     ```
 
-    
+
+
+
+# 5 Nanohub
+
+## 5.1 download codebase
+
+```shell
+git clone ssh://rulei_zhou@tpe.git.htc.com:29419/common/htc/nanohub.git
+cd nanohub
+git branch -a 
+git checkout -b <LOCAL_BRANCH_NAME> <REMOTE_BRANCH>
+```
+
+## 5.2 Environment
+
+* [download gcc-arm-none-eabi](https://launchpad.net/gcc-arm-embedded/+download)
+
+* extract (tar jxvf)
+
+* set alias han_setupCHRE
+
+  ```shell
+  alias han_setupCHRE='export PATH=$HOME/gcc-arm-none-eabi-5_2-2015q4/bin/:${PATH}; export CROSS_COMPILE=arm-none-eabi-'
+  ```
+
+## 5.3 Build
+
+* `han_setupCHRE`
+
+* Check which project you want to build (You may use **ls project**)
+
+* build
+
+  ```shell
+  ./build.sh <PROJECT_NAME>
+  ```
+
+* flash 
+
+  ```shell
+  adb push ./out/nanohub.full.oceannote.bin vendor/firmware/nanohub.full.bin
+  adb shell nanoapp_cmd download
+  ```
+
+## 5.4 Commit
+
+* master
+
+  ```shell
+  git push ssh://rulei_zhou@git.htc.com:29419/common/htc/nanohub.git HEAD:refs/for/sensor/master
+  ```
+
+* chre1.0
+
+  ```shell
+  git push ssh://rulei_zhou@git.htc.com:29419/common/htc/nanohub.git HEAD:refs/for/sensor/master-chre-1.0
+  ```
+
+* Jenkins build
+
+  提交之后Jenkins 会进行编译。编译成功后会有相应fw的链接，然后根据需要将fw cherry pick 到我们需要的branch
+
+* Example
+
+  [示例](http://git.htc.com:8081/#/c/1082913/)
+
+  ![](/5-4-1.png)
+
