@@ -2,7 +2,9 @@
 title: Go 方法
 date: 2019-12-16 18:16:57
 categories:
+- Go
 tags:
+- Go
 typora-root-url: Go-方法
 typora-copy-images-to: Go-方法
 ---

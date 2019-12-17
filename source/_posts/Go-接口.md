@@ -2,7 +2,9 @@
 title: Go 接口
 date: 2019-12-17 10:55:54
 categories:
+- Go
 tags:
+- Go
 typora-root-url: Go-接口
 typora-copy-images-to: Go-接口
 ---

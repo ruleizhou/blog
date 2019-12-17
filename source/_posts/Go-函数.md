@@ -2,7 +2,9 @@
 title: Go 函数
 date: 2019-12-16 11:11:04
 categories:
+- Go
 tags:
+- Go
 typora-root-url: Go-函数
 typora-copy-images-to: Go-函数
 ---
