@@ -98,16 +98,16 @@ func test1(ch chan int){
 
 Channel通道在使用的时候，有以下几个注意点：
 
-- 1.用于goroutine，传递消息的。
-- 2.通道，每个都有相关联的数据类型,
+- 用于goroutine，传递消息的。
+- 通道，每个都有相关联的数据类型,
   nil chan，不能使用，类似于nil map，不能直接存储键值对
-- 3.使用通道传递数据：<-
+- 使用通道传递数据：<-
   chan <- data,发送数据到通道。向通道中写数据
   data <- chan,从通道中获取数据。从通道中读数据
-- 4.阻塞：
+- 阻塞：
   发送数据：chan <- data,阻塞的，直到另一条goroutine，读取数据来解除阻塞
   读取数据：data <- chan,也是阻塞的。直到另一条goroutine，写出数据解除阻塞。
-- 5.本身channel就是同步的，意味着同一时间，只能有一条goroutine来操作。
+- 本身channel就是同步的，意味着同一时间，只能有一条goroutine来操作。
 
 最后：通道是goroutine之间的连接，所以通道的发送和接收必须处在不同的goroutine中。
 
